@@ -1,0 +1,78 @@
+# PULSY Options Collector
+
+Щоденний snapshot опціонного ринку з **Deribit Public API** (без ключа).
+
+## Що збирає
+
+| Група | Метрики |
+|-------|---------|
+| **Критичні** | Put/Call Ratio, Max Pain, DVOL Index |
+| **Стратегічні** | OI by Strike, 25D Skew, Total OI (USD) |
+| **Динаміка** | OI Change, Volume, Term Structure |
+| **Технічні** | IV Surface, Greeks (Delta/Gamma/Theta/Vega) |
+
+## Розклад
+
+Щодня о **08:05 UTC** — після закриття щоденної Deribit експірації (08:00 UTC).
+
+## Зберігає
+
+```
+Dropbox/pulsy/options/BTC/2026-04-25.json
+Dropbox/pulsy/options/ETH/2026-04-25.json
+```
+
+## Railway Variables
+
+| Змінна | Обов'язково | Опис |
+|--------|-------------|------|
+| `DROPBOX_TOKEN` | ✅ | Dropbox access token |
+| `COINS` | ❌ | Монети через кому (за замовч. `BTC,ETH`) |
+
+## Деплой
+
+1. Створи новий GitHub репозиторій
+2. Завантаж файли: `options_collector.py`, `Procfile`, `requirements.txt`
+3. Railway → New Service → підключи репо
+4. Variables → додай `DROPBOX_TOKEN`
+5. Deploy
+
+## Формат файлу
+
+```json
+{
+  "date": "2026-04-25",
+  "coin": "BTC",
+  "source": "deribit_public",
+  "snapshot_time": "08:05 UTC",
+
+  "put_call_ratio": {
+    "by_oi": 0.42,
+    "by_volume": 0.38,
+    "signal": "greed"
+  },
+  "max_pain": {
+    "nearest": 84000,
+    "by_expiry": { "25APR26": 84000, "30MAY26": 86000 },
+    "vs_spot_pct": -1.2
+  },
+  "dvol": {
+    "current": 52.3,
+    "open": 50.1,
+    "high": 54.8,
+    "low": 49.6,
+    "close": 52.3,
+    "zone": "normal"
+  },
+  "oi_total": {
+    "calls_usd": 12500000000,
+    "puts_usd": 5200000000,
+    "total_usd": 17700000000
+  },
+  "skew_25d": { "1w": -3.2, "1m": -1.9, "3m": -0.5 },
+  "term_structure": { "1w": 48.5, "1m": 52.3, "3m": 54.8 },
+  "top_strikes": [
+    { "strike": 85000, "total_oi": 12500, "call_oi": 8000, "put_oi": 4500 }
+  ]
+}
+```
